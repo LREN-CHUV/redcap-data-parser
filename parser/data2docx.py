@@ -11,6 +11,7 @@ from docx.shared import Inches
 import redcap_parser as rp
 
 
+
 def data2word(data_vals,col_names,document):
     """ 
         data_vals   : list 
@@ -43,7 +44,7 @@ def data2word(data_vals,col_names,document):
             run.add_break()    
    
 
-def save2word_document(ws,index):
+def save2word_document(ws):
     document = Document()
 
     document.add_heading('redcap_data', 0)
@@ -53,7 +54,8 @@ def save2word_document(ws,index):
 
     for i in range(2,num_rows):
         print 'subject: ', i
-        data_val,col_names = rp.extrat_data_row(ws,i,index)
+        col_names,data_val = rp.extrat_row(ws,i)
+        print data_val
         data2word(data_val,col_names,document)
 
     document.save('redcap_python.docx')    
