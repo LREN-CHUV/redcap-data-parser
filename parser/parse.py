@@ -9,12 +9,13 @@ if __name__ == '__main__':
     ws       = rp.import_excel(filename)
     index    = rp.col_not_checked(ws)
 
+    
 
     
 #%% Save data as word document
 
 
-    d2d.save2word_document(ws,index)
+    data_val, col_names = d2d.save2word_document(ws,index)
 
 
 

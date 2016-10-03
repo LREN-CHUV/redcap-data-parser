@@ -71,7 +71,8 @@ def extrat_data_row(sh,row_id,col_index):
         for j in col_index:
             
             col_name = str(sh.cell(row=1,column=j).value)
-            val      = sh.cell(row=row_id,column=j).value
+            
+            val      =     sh.cell(row=row_id,column=j).value
 
             if isinstance(val,unicode):
                 data_j = val.encode('ascii','ignore')

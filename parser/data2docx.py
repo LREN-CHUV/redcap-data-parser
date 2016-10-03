@@ -51,10 +51,11 @@ def save2word_document(ws,index):
 
     num_rows = ws.max_row
 
-    for i in range(1,num_rows):
+    for i in range(2,num_rows):
         print 'subject: ', i
         data_val,col_names = rp.extrat_data_row(ws,i,index)
         data2word(data_val,col_names,document)
 
     document.save('redcap_python.docx')    
+    return data_val, col_names
             
