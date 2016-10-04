@@ -18,20 +18,22 @@ class Component:
     
     def __init__(self):
         
-        self.title = ''
+        self.titles = []
         self.feature = ''
         self.component = ''
         self.contribution = ''
         self.short_desc = ''
+        self.subject_ID = ''
         
         self.data_hosp = []
         self.data_ref = []
         
-        self.soft = []
+        self.soft = dict()
         
-        self.release = []
+        self.release = dict()
         
-        self.use_case = []
+        self.use_case = {'users':'','desc':''}
+        
         
         
     def add_data(self,dtype,desc):
@@ -81,10 +83,13 @@ class Component:
         
       """
       
-      self.soft.append([name,desc])
-    
+      if name in self.soft:
+          self.soft[name].append(desc)
+      else:
+          self.soft[name] = [desc]
       
-    def add_release(self,name,desc)  :
+      
+    def add_release(self,name,desc):
       """
             Adds a redcap RELEASE component
             
@@ -101,8 +106,10 @@ class Component:
         
       """        
       
-      self.release.append([name,desc])
-      
+      if name in self.release:
+          self.release[name].append(desc)
+      else:
+          self.release[name] = [desc]      
       
 
     def add_usecase(self,users,desc):
@@ -121,8 +128,10 @@ class Component:
            add_usecase('Planned functionality at M12','Initial implementation of image factorisation method without distributed computing (MS126).')
         
       """     
-      
-      self.use_case.append([users,desc])
+     
+      self.use_case['users'] = users
+      self.use_case['desc']  = desc
+ 
         
         
         

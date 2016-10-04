@@ -2,7 +2,7 @@ from openpyxl import load_workbook
 import re
 
 
-
+            
 def import_excel(filename):
     """
         Imports an excel sheet
@@ -13,7 +13,8 @@ def import_excel(filename):
     sh = wb["data"]
 
     return sh
-    
+   
+
     
     
 def get_col_indicies(sh,col_names):
@@ -70,6 +71,8 @@ def get_question_type(str1):
         return '(select one or many)'
     elif len(re.findall('\\b(select one)\\b', str1)) > 0:
         return '(select one)' 
+    elif len(re.findall('\\bTarget User\\b', str1)) > 0:
+        return 'Target User'
     else:
         return "'(choice='"
 
@@ -114,6 +117,27 @@ def extrat_row_no_check(sh,row_id,col_index):
 
 
 
+def remove_bs(names):
+    """
+        
+    Removes bullshit form names such as '(in line with the milestones) ' etc..
+    
+    
+    Example
+    -------
+    
+    remove_bs(['Planned functionality at M12 (in line with the milestones)'])
+        
+        returns ['Planned functionality at M12']
+    
+    """
+    
+    return [x.replace('(in line with the milestones)','').strip() for x in names]
+    
+    
+    
+   
+
 
 def extrat_row(ws,row_id):
    """
@@ -138,10 +162,17 @@ def extrat_row(ws,row_id):
        append   = True
     
        if data_j == 'Checked':
+           
            question_type = get_question_type(col_name)        
-           question = get_question(col_name,question_type)    
+           if question_type != 'Target User':
+               question      = get_question(col_name,question_type)    
+           else:
+               question = question_type
            
            answer   = get_answer(col_name)
+           
+           #print col_name, question, answer
+
 
 
            col_name = question
@@ -155,11 +186,16 @@ def extrat_row(ws,row_id):
 
        if col_name == 'To which building block your component belongs to ? (select one)':
            col_name = 'To which building block your component belongs to ?'         
-        
+
+           
 
        if append:  
+           
            col_names.append(col_name)
            data_val.append(data_j) 
+           
+
+   col_names = remove_bs(col_names)           
        
    return col_names,data_val    
 

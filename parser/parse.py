@@ -41,10 +41,18 @@ def find(name,names):
     
 
 def find_all(name,names):
-    indices = [i for i, x in enumerate(names) if x == name]
-    return indices           
-  
+    return [i for i, x in enumerate(names) if x == name]
+    
    
+def find_all_contains(name,names):
+    """
+        All names of release contain the following:
+            
+            'Planned functionalities at'
+    """
+    return [i for i, x in enumerate(names) if name in x]
+        
+    
 
 #%% function takes a one row and converts it to an object
 
@@ -58,6 +66,21 @@ def rowdata2component(ws,col_names,data_val):
     
     
     # Extact the various components
+    index = find('To which building block your component belongs to ?',col_names)
+    if index != -1:
+        
+        elements = data_val[index].split('>')
+        comp.titles = [x.strip() for x in elements]
+        """
+         SOFTWARE
+         Data Factory (DF): 
+         Feature Engineering  
+        """
+                    
+
+    else:
+        print '[Error] Could not find: which building block your component belongs to ?'
+      
     
     # Component name
     
@@ -92,7 +115,7 @@ def rowdata2component(ws,col_names,data_val):
                             
         print elements
 
-        if dtype== 'DATA':
+        if dtype == 'DATA':
             
             if elements[1] == 'Hospital Data':
                 comp.add_data('hospital',elements[2])
@@ -102,12 +125,42 @@ def rowdata2component(ws,col_names,data_val):
                 print 'Error no such DATA > ' +  elements[1] + ' not implemented!'
             
         elif dtype == 'SOFTWARE':
-            com.add_soft(elements[1],elements[2])
+            comp.add_soft(elements[1],elements[2])
         else:
             print 'Error no such element [ ' +  elements[0] + ' ] implemented'
+      
+
+    # Releases       
+    
+    idx = find_all_contains('Planned functional',col_names)
+    
+    for i in idx:
+        if data_val[i] != 'None':
+            comp.add_release(col_names[i],data_val[i])
             
-                    
+            
+    # Use Cases            
+            
+                        
     return comp
+    
+#%% DEBUG
+
+str3 = ['Participant ID', 'Data Access Group', 'Survey Identifier',
+        'Survey Timestamp', 'Task leader name', 'Task number attached to this component',
+        'Name of this component', 'Short Description of this component',
+        'To which building block your component belongs to ?', 
+        'Which other building blocks does your component need ?',
+        'Planned functionality at M12', 'Planned functionalities at M18', 'Planned functionalities at M24', '']
+
+
+idx    = find_all_contains('Planned functional',str3)
+
+print idx
+    
+#%%
+
+ 
     
 #%% component -> word document
 
@@ -140,12 +193,18 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft):
 
     """
     
-    table = wdoc.add_table(rows=3, cols=3)
+    # get number of sofware componets
+    num_soft = len(soft.keys())
+    
+    
+    tab_num_rows = 2 + num_soft
+    
+    table = wdoc.add_table(rows=tab_num_rows, cols=3)
     
     data_hosp = ', '.join(data_hosp)
     data_ref  = ', '.join(data_ref)
     
-    print data_hosp
+
     
     # Hospital Data
     row = table.rows[0]
@@ -153,19 +212,51 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft):
     row.cells[1].text = 'Hospital'
     row.cells[2].text = data_hosp
 
+
+
     # Reference Data
     row = table.rows[1]
     row.cells[1].text = 'Reference'
     row.cells[2].text = data_ref
 
-    # Reference Data
+    # Software Data
     row = table.rows[2]
     row.cells[0].text = 'SOFTWARE'
+    
+
+    idx = 2    
+    for key in soft:
+        row = table.rows[idx]
+        soft_desc = ', '.join(soft[key])
+        row.cells[1].text = key
+        row.cells[2].text = soft_desc
+        idx = idx + 1
+    
 
 
 
-def releases2docx(wdoc):
-    pass
+def releases2docx(wdoc,release):
+    """
+        Takes release information  (Planned functional etc..)
+    
+    
+    """
+    
+    num_releases = len(comp.release.keys())
+       
+    table = wdoc.add_table(rows=num_releases, cols=2)
+    
+    idx = 0    
+    for key in release:
+        row = table.rows[idx]
+        print key
+        row.cells[0].text = key
+        row.cells[1].text = release[key]
+
+        idx = idx + 1
+    
+    
+    
     
     
     
@@ -173,21 +264,34 @@ def releases2docx(wdoc):
     
 def component2docx(document,comp):
     
+    
+    # Titles
+    document.add_heading(comp.titles[0], level=1)
+    document.add_heading(comp.titles[1], level=2)
+    document.add_heading(comp.titles[2], level=3)
+    
+    
     p = document.add_paragraph()
+    p.add_run('\n\n')
     
     one_line_2_docx(p,'Component: ',            comp.component)
     one_line_2_docx(p,'Contributing task(s): ', comp.contribution)
     one_line_2_docx(p,'Description: ',          comp.short_desc)
     
+    
     # Prior Dependencies table:
+    p = document.add_paragraph()
     one_line_2_docx(p,'Dependencies:')
     
     #  add table
     dependencies2docx(document,comp.data_hosp,comp.data_ref,comp.soft)
-        
-   
-    
-    
+
+    # Prior Release table:
+    p = document.add_paragraph()
+    p.add_run('\n')
+    one_line_2_docx(p,'Releases:')
+    releases2docx(document,comp.release)
+
     
     
 
@@ -195,23 +299,18 @@ def component2docx(document,comp):
 #%% Test word document to component
 
 
-document = Document()
+comp = rowdata2component(ws,col_names,data_val)    
 
-document.add_heading('redcap_data', 0)
-document.add_paragraph('automatically generated from python')
-    
+
+document = Document()
+   
 
 component2docx(document,comp)
    
 
 document.save('test.docx')    
 
- 
-    
- #%%
 
- 
-comp = rowdata2component(ws,col_names,data_val)
 
 
 #%%
