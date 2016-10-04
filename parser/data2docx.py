@@ -77,8 +77,8 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft):
         return
             
     table       = wdoc.add_table(rows=tab_num_rows, cols=3)
-
-    
+    table.style = 'TableGrid'
+   
     
 
     if tcase == 'full':
@@ -149,6 +149,8 @@ def releases2docx(wdoc,release):
     num_releases = len(release.keys())
        
     table = wdoc.add_table(rows=num_releases, cols=2)
+    table.style = 'TableGrid'
+
     
     idx = 0    
     for key in release:
@@ -162,6 +164,8 @@ def usecase2docx(wdoc,use_case):
     
     
     table = wdoc.add_table(rows=2, cols=2)
+    table.style = 'TableGrid'
+    
 
     # Heading
     row = table.rows[0]
