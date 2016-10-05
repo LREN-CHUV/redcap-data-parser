@@ -8,6 +8,7 @@ Created on Mon Oct  3 17:24:32 2016
 
 from docx import Document
 import redcap_parser as rp
+from tree import Tree
 
 
 def one_line_2_docx(p,name,value=''):
@@ -22,9 +23,124 @@ def one_line_2_docx(p,name,value=''):
     if value != '':
         p.add_run(value)
         p.add_run('\n')
+        
+        
+        
+def comp2docx(document,comp,bSorted=False):
+    
+    
+    p = document.add_paragraph()
+    
+    p.add_run('----------------------------------------------------------------------------------------------------------------------------------------------------\n')   
+    one_line_2_docx(p,'Component(' + comp.subject_ID  + ') \n')           
+    one_line_2_docx(p,'Task leader: ', comp.task_leader      )
+    
+    if bSorted == False:
+        for task in comp.tasks:
+            print 'processing task: ', task.name 
+            task2docx(document,task)
+    else:
+        
+        comp.sort()
+        leaf_nodes = comp.tree.get_leaf_nodes()
+        
+        
+        for leaf in leaf_nodes:
+        
+            # PRINT HEADING OF ONE LEAF
+            
+            elements = leaf.path
+            i = 1
+            for elem in elements:
+                document.add_heading(elem, level=i)
+                i = i + 1
+                
+            p.add_run('\n')
+    
+            for idx in leaf.idx:
+                
+                task2docx(document,comp.tasks[idx],b_print_heading=False)
+                
+def sorted_task2docx(document,tasks):
+
+    tree = Tree()
+    for i in range(0,len(tasks)):
+        if len(tasks[i].build_block_belong) == 3:
+            tree.add_element(tasks[i].build_block_belong,i)   
+            
+            
+    p = document.add_paragraph()       
+            
+                
+    leaf_nodes = tree.get_leaf_nodes()
+    for leaf in leaf_nodes:
+                # PRINT HEADING OF ONE LEAF
+           
+            elements = leaf.path
+            i = 1
+            for elem in elements:
+                document.add_heading(elem, level=i)
+                i = i + 1
+                
+            p.add_run('\n')
+    
+            for idx in leaf.idx:
+                task2docx(document,tasks[idx],b_print_heading=False)
+     
+        
+    
+def task2docx(document,task,b_print_heading=True):    
+    
+    # To which building block your component belongs to
+    
+    if b_print_heading:
+        elements = task.build_block_belong # ('SOFTWARE', 'Data Factory (DF)', 'Feature Engineering')
+        i = 1;
+        for elem in elements:
+            document.add_heading(elem, level=i)
+            i = i + 1
+    
+    bPrint = True
+        
+    if bPrint == True:
+        #Prior Dependencies table:
+        p = document.add_paragraph()
+        p.style = 'Normal'
+    
+        one_line_2_docx(p,'Contributing task: ',task.task_number)
+        one_line_2_docx(p,'Description: '      ,task.short_desc_comp)
+
+    
+        one_line_2_docx(p,'Dependencies:')
+    
+        #  add table
+    
+        data_hosp = task.build_block_data.get('Hospital Data',[])
+        data_ref  = task.build_block_data.get('Reference data',[])
+    
+        soft      = task.build_block_soft
+        serv      = task.build_block_serv
+        
+    
+        dependencies2docx(document,data_hosp,data_ref,soft,serv)
+
+    
+        # Prior Release table:
+        p = document.add_paragraph()
+        p.add_run('\n')
+        one_line_2_docx(p,'Releases:')
+        releases2docx(document,task.planned_functionality)
+    
+        # Prior User table:
+        p = document.add_paragraph()
+        p.add_run('\n')
+        one_line_2_docx(p,'User and Use cases:')   
+        usecase2docx(document,task.users,task.short_desc_usecase)    
+    
+            
     
 
-def dependencies2docx(wdoc,data_hosp,data_ref,soft):
+def dependencies2docx(wdoc,data_hosp,data_ref,soft,services):
     """
         
     Takes Data and software information and puts it into a table
@@ -35,7 +151,9 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft):
     wdoc: python-docx word document object
     data_hosp: DATA > Hospital Data > [] list
     data_ref : DATA > Reference Data > [] list
-
+    soft     : dict
+    services : dict
+    
     """
     
     data_hosp = ', '.join(data_hosp)
@@ -54,24 +172,30 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft):
         
         
    
-    # get number of sofware componets
+    # get number of sofware 
     num_soft = len(soft.keys())
+    
+    # get number of services
+    num_serv = len(services.keys())
+    
     
     tcase = 'full'
     
     if bDataHosp & bDataRef  :
-        tab_num_rows = 2 + num_soft
+        tab_num_rows = 2 + num_soft + num_serv
         tcase        = 'full'    
     elif (bDataHosp == True) & (bDataRef == False):
-        tab_num_rows = 1 + num_soft
+        tab_num_rows = 1 + num_soft + num_serv
         tcase        = 'only_hosp'         
     elif (bDataHosp == False) & (bDataRef == True):
-        tab_num_rows = 1 + num_soft
+        tab_num_rows = 1 + num_soft + num_serv
         tcase        = 'only_ref'         
     else:
-        tab_num_rows = num_soft   
+        tab_num_rows = num_soft + num_serv  
         tcase        = 'only_soft'         
     
+        
+        
         
     if tab_num_rows == 0:
         return
@@ -123,21 +247,41 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft):
     print tcase, r_idx, tab_num_rows
         
 
-    # Software Data
-    row = table.rows[r_idx]
-    row.cells[0].text = 'SOFTWARE'
+    if r_idx < len(table.rows):
+        # Software Data
+        row = table.rows[r_idx]
+        row.cells[0].text = 'SOFTWARE'
     
+        idx = r_idx    
+        for key in soft:
+            row = table.rows[idx]
+            soft_desc = ', '.join(soft[key])
+            row.cells[1].text = key
+            row.cells[2].text = soft_desc
+            idx = idx + 1
+        r_idx = idx    
+    else:
+        
+        print '[Error] r_idx >= len(table.rows):   r_idx: ', r_idx, '  len(table.rows):  ', len(table.rows) 
+     
+    if num_serv != 0:
+        row = table.rows[r_idx]
+        row.cells[0].text = 'SERVICES'   
+        idx = r_idx    
+        
+        
+        
+        for key in services:
+             row = table.rows[idx]
+             serv_desc = ', '.join(services[key])
+             row.cells[1].text = key
+             row.cells[2].text = serv_desc
+             idx = idx + 1
+        r_idx = idx    
 
-    idx = r_idx    
-    for key in soft:
-        row = table.rows[idx]
-        soft_desc = ', '.join(soft[key])
-        row.cells[1].text = key
-        row.cells[2].text = soft_desc
-        idx = idx + 1
+        
+        
     
-
-
 
 def releases2docx(wdoc,release):
     """
@@ -160,7 +304,7 @@ def releases2docx(wdoc,release):
 
         idx = idx + 1
 
-def usecase2docx(wdoc,use_case):
+def usecase2docx(wdoc,users,short_desc_usecase):
     
     
     table = wdoc.add_table(rows=2, cols=2)
@@ -174,9 +318,8 @@ def usecase2docx(wdoc,use_case):
 
     # User & Use cases    
     row = table.rows[1]
-    row.cells[0].text = use_case['users']
-    row.cells[1].text = use_case['desc']
-    
+    row.cells[0].text = users
+    row.cells[1].text = short_desc_usecase   
 
     
 def component2docx(document,comp):
@@ -208,7 +351,8 @@ def component2docx(document,comp):
     
     one_line_2_docx(p,'Dependencies:')
     
-    #  add table
+    
+    
     dependencies2docx(document,comp.data_hosp,comp.data_ref,comp.soft)
 
     # Prior Release table:
@@ -224,8 +368,6 @@ def component2docx(document,comp):
     one_line_2_docx(p,'User and Use cases:')   
     usecase2docx(document,comp.use_case)
     
-
-
 
 def data2word(data_vals,col_names,document):
     """ 

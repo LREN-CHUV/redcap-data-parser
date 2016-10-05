@@ -7,6 +7,11 @@ Created on Tue Oct  4 11:12:48 2016
 """
 
 
+from tree import Tree
+
+
+
+
 
 class Component:
     """
@@ -18,139 +23,31 @@ class Component:
     
     def __init__(self):
         
-        self.titles = []
-        self.feature = ''
-        self.component = ''
-        self.contribution = ''
-        self.short_desc = ''
-        self.subject_ID = ''
-        
-        self.data_hosp = []
-        self.data_ref = []
-        
-        self.soft = dict()
-        
-        self.release = dict()
-        
-        self.use_case = {'users':'','desc':''}
-        
-        
-        
-    def add_data(self,dtype,desc):
-       """
-          Adds a redcap DATA component.
-              
-       Parameters
-       ----------
-       
-           dtype : string, ('hospital' or 'reference')
-           desc  : string, list of people using this data (ex: list of hosptials)
-           
-       Example
-       -------
-       
-           add_data('hospital','Lille Hospital, Tel Aviv Hospital, Freiburg Hospital')
-           
-              
-       """
-       
-       if dtype == 'hospital':
-           
-           self.data_hosp.append(desc)
-           
-       elif dtype == 'reference':
+        self.survey_timestamp = 'None'
+        self.task_leader      = 'None'
+        self.subject_ID       = 'None'
+        self.tasks            = []
 
-           self.data_ref.append(desc)
-           
-       else:
-           print 'Error dtype: ' + dtype + ' not supported, only [hospital,reference] currently supported'
-           
+        self.stasks           = dict()
+        self.tree             = Tree()
 
-    def add_soft(self,name,desc):
-      """
-            Adds a redcap SOFTWARE component
-            
-       Parameters
-       ----------
-       
-           name : string, software name
-           desc  : string, list of people using this data (ex: list of hosptials)
-           
-       Example
-       -------
-       
-           add_soft('Data Factory (DF)','Data Anonymisation, Workflow Engine, Data Pipeline processes, Data Quality Processes, Data Storage')
-        
-      """
-      
-      if name in self.soft:
-          self.soft[name].append(desc)
-      else:
-          self.soft[name] = [desc]
-      
-      
-    def add_release(self,name,desc):
-      """
-            Adds a redcap RELEASE component
-            
-       Parameters
-       ----------
-       
-           name : string, release name
-           desc  : string, description
-           
-       Example
-       -------
-       
-           add_release('Planned functionality at M12','Initial implementation of image factorisation method without distributed computing (MS126).')
-        
-      """        
-      
-      if name in self.release:
-          self.release[name].append(desc)
-      else:
-          self.release[name] = [desc]      
-      
+    
+    
+    def sort(self):
+        """
+            Tasks are categorises according to task.build_block_belong
+             which have three elements, for instance:
+                
+                 ['SOFTWARE','Data Factory (DF)','Feature Engineering']                 
+                 
 
-    def add_usecase(self,users,desc):
-      """
-            Adds a redcap USE CASE component
+        """        
+       
+        for i in range(0,len(self.tasks)):
+            if len(self.tasks[i].build_block_belong) == 3:
+                self.tree.add_element(self.tasks[i].build_block_belong,i)                
+
             
-       Parameters
-       ----------
-       
-           uses : list,   list of users
-           desc : string, description
-           
-       Example
-       -------
-       
-           add_usecase('Planned functionality at M12','Initial implementation of image factorisation method without distributed computing (MS126).')
-        
-      """     
-     
-      self.use_case['users'] = users
-      self.use_case['desc']  = desc
- 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-       
-        
-        
         
         
         
