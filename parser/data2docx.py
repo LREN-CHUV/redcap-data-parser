@@ -105,10 +105,10 @@ def task2docx(document,task,b_print_heading=True):
     if bPrint == True:
         #Prior Dependencies table:
         p = document.add_paragraph()
-        p.style = 'Normal'
     
-        one_line_2_docx(p,'Contributing task: ',task.task_number)
-        one_line_2_docx(p,'Description: '      ,task.short_desc_comp)
+        one_line_2_docx(p,'Component name:     ',task.name)
+        one_line_2_docx(p,'Contributing task:  ',task.task_number)
+        one_line_2_docx(p,'Description:        ',task.short_desc_comp)
 
     
         one_line_2_docx(p,'Dependencies:')
