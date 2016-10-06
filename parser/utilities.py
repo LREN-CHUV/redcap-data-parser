@@ -8,7 +8,19 @@ Created on Tue Oct  4 15:46:48 2016
 from component import Component
 from task import Task
 
-   
+def unicode2ascii(value):
+    if isinstance(value,unicode):
+       return value.encode('ascii','ignore')
+    else:
+       return str(value)
+       
+def remove_quotations(string):
+    if string.startswith('"') and string.endswith('"'):
+        return string[1:-1]
+    else:
+        return string
+        
+  
     
 def find(name,names):
     """
@@ -49,7 +61,8 @@ def get_data(name,col_names,data_val):
 def row2comp(col_names,data_val):
 
     comp = Component()
-
+    
+    
     comp.subject_ID         = get_data('Participant ID',col_names,data_val)
     comp.survey_timestamp   = get_data('Survey Timestamp',col_names,data_val)
     comp.task_leader        = get_data('Task leader name',col_names,data_val)

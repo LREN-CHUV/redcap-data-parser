@@ -87,7 +87,7 @@ def sorted_task2docx(document,tasks):
             for idx in leaf.idx:
                 task2docx(document,tasks[idx],b_print_heading=False)
      
-        
+    return tree    
     
 def task2docx(document,task,b_print_heading=True):    
     
@@ -200,7 +200,7 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft,services):
     if tab_num_rows == 0:
         return
             
-    table       = wdoc.add_table(rows=tab_num_rows, cols=3)
+    table       = wdoc.add_table(rows=tab_num_rows, cols=2)
     table.style = 'TableGrid'
    
     
@@ -210,13 +210,13 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft,services):
         # Hospital Data
         row = table.rows[0]
         row.cells[0].text = 'DATA'
-        row.cells[1].text = 'Hospital'
-        row.cells[2].text = data_hosp
+        #row.cells[1].text = 'Hospital'
+        row.cells[1].text = 'Hospital: ' + data_hosp
 
         # Reference Data
         row = table.rows[1]
-        row.cells[1].text = 'Reference'
-        row.cells[2].text = data_ref
+        # row.cells[1].text = 'Reference'
+        row.cells[1].text = 'Reference: ' + data_ref
 
         r_idx = 2
 
@@ -225,8 +225,8 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft,services):
         # Hospital Data
         row = table.rows[0]
         row.cells[0].text = 'DATA'
-        row.cells[1].text = 'Hospital'
-        row.cells[2].text = data_hosp
+        #row.cells[1].text = 'Hospital'
+        row.cells[1].text = 'Hospital: ' + data_hosp
 
         r_idx = 1
         
@@ -234,8 +234,8 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft,services):
 
         # Reference Data
         row = table.rows[0]
-        row.cells[1].text = 'Reference'
-        row.cells[2].text = data_ref
+        #row.cells[1].text = 'Reference'
+        row.cells[1].text = 'Reference: ' + data_ref
 
         r_idx = 1
     
@@ -256,8 +256,8 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft,services):
         for key in soft:
             row = table.rows[idx]
             soft_desc = ', '.join(soft[key])
-            row.cells[1].text = key
-            row.cells[2].text = soft_desc
+            #row.cells[1].text = key
+            row.cells[1].text = key + ': ' + soft_desc
             idx = idx + 1
         r_idx = idx    
     else:
@@ -274,8 +274,8 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft,services):
         for key in services:
              row = table.rows[idx]
              serv_desc = ', '.join(services[key])
-             row.cells[1].text = key
-             row.cells[2].text = serv_desc
+             #row.cells[1].text = key
+             row.cells[1].text = key + ': ' + serv_desc
              idx = idx + 1
         r_idx = idx    
 

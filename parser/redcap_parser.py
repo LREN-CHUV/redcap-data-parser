@@ -1,22 +1,40 @@
 from openpyxl import load_workbook
 import re
+import utilities as util
+import csv
 
 
             
-def import_excel(filename):
+def import_excel(filename,worksheet_name):
     """
         Imports an excel sheet
     
     """
     
     wb = load_workbook(filename)
-    sh = wb["data"]
+    sh = wb[worksheet_name]
 
     return sh
    
 
+def import_csv(filename):
+    data       = []
+    with open(filename, 'rb') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',')
+        for row in spamreader:
+            data.append(row)
+            
+        
+            
+    if data[0][0] != 'Participant ID':
+      data[0][0] = 'Participant ID'      
+            
+    return data            
+            
+
+
     
-    
+
 def get_col_indicies(sh,col_names):
     """
         given a list of column names (first row) return all column indicies 
@@ -44,6 +62,8 @@ def get_col_indicies(sh,col_names):
                 indices[cell_name] = [j]
             
     return indices            
+    
+    
     
     
 def col_not_checked(sh):
@@ -104,6 +124,7 @@ def extrat_row_no_check(sh,row_id,col_index):
    for j in col_index:
        col_name = str(sh.cell(row=1,column=j).value)
        val      =     sh.cell(row=row_id,column=j).value
+
        if isinstance(val,unicode):
            data_j = val.encode('ascii','ignore')
        else:
@@ -135,29 +156,18 @@ def remove_bs(names):
     return [x.replace('(in line with the milestones)','').strip() for x in names]
     
     
-    
-   
-
-
-def extrat_row(ws,row_id):
-   """
-   
-   """
-   col_names = []
-   data_val  = []
-
-   num_col = ws.max_column
-
-   for j in range(1,num_col):
-       col_name = str(ws.cell(row=1,column=j).value)
-       val      =     ws.cell(row=row_id,column=j).value
-
+  
+       
+def sanitise_row(col_name,val): 
        # ASCII check
-       if isinstance(val,unicode):
-           data_j = val.encode('ascii','ignore')
-       else:
-           data_j = str(val)
-           
+       col_name = util.unicode2ascii(col_name)
+       data_j   = util.unicode2ascii(val)
+       
+       col_name = util.remove_quotations(col_name)
+       data_j   = util.remove_quotations(data_j)
+
+       
+       #print col_name, ' ==> ', data_j
            
        append   = True
     
@@ -188,13 +198,72 @@ def extrat_row(ws,row_id):
            col_name = 'To which building block your component belongs to ?'         
 
            
+           
+       return col_name,data_j,append     
 
-       if append:  
+       
+def csv2data(data,row_id):
+
+
+   first_row = data[0]
+   values    = data[row_id]
+   num_cols  = len(first_row)
+    
+   col_names = []
+   data_val  = []
+    
+   for i in range(0,num_cols):
+        col_name,data_j,append  = sanitise_row(first_row[i],values[i])
+       
+        if append:  
+           
+           if col_name is None:
+               col_name = 'None'
+              
+           if data_val is  None:
+               data_val = 'None'
            
            col_names.append(col_name)
            data_val.append(data_j) 
            
 
+        
+   col_names = remove_bs(col_names)           
+       
+   return col_names,data_val    
+           
+       
+
+def extrat_row(ws,row_id):
+   """
+   
+   """
+   col_names = []
+   data_val  = []
+
+   num_col = ws.max_column
+
+   for j in range(1,num_col):
+       col_name =     ws.cell(row=1,column=j).value
+       val      =     ws.cell(row=row_id,column=j).value
+
+
+       col_name,data_j,append  = sanitise_row(col_name,val)
+     
+
+       if append:  
+           
+           if col_name is None:
+               col_name = 'None'
+              
+           if data_val is  None:
+               data_val = 'None'
+           
+           col_names.append(col_name)
+           data_val.append(data_j) 
+           
+
+        
    col_names = remove_bs(col_names)           
        
    return col_names,data_val    

@@ -11,8 +11,6 @@ from tree import Tree
 
 
 
-
-
 class Component:
     """
         
@@ -45,9 +43,24 @@ class Component:
        
         for i in range(0,len(self.tasks)):
             if len(self.tasks[i].build_block_belong) == 3:
-                self.tree.add_element(self.tasks[i].build_block_belong,i)                
+                self.tree.add_element(self.tasks[i].build_block_belong,i)           
+                
+                
+                
+    def __str__(self):
+     """
+        print statistics of the components         
 
-            
-        
-        
-        
+     """               
+     
+     print 'Task leader:     ', self.task_leader
+     print 'Subject_ID:      ', self.subject_ID
+     print 'Number of tasks: ', len(self.tasks)
+     for task in self.tasks:
+         print ' ', task.name         
+         print ' ', task.task_number         
+         
+     
+     return ''
+     
+     
