@@ -1,4 +1,4 @@
-# Redcap excel parser
+# Redcap data parser
 
 [![Build Status](https://travis-ci.org/gpldecha/hbp-parser.svg?branch=master)](https://travis-ci.org/gpldecha/hbp-parser)
 
