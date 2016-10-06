@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/gpldecha/hbp-parser.svg?branch=master)](https://travis-ci.org/gpldecha/hbp-parser)
 
-![RedCap Logo](docs/redcap_logo.png =100x20)
+<img src="docs/redcap_logo.png" width="600" height="200" />
 
 RedCap
 
