@@ -1,6 +1,6 @@
 # Redcap data parser
 
-[![Build Status](https://travis-ci.org/gpldecha/hbp-parser.svg?branch=master)](https://travis-ci.org/gpldecha/hbp-parser)
+[![Build Status](https://travis-ci.org/LREN-CHUV/hbp-parser.svg?branch=master)](https://travis-ci.org/LREN-CHUV/hbp-parser)
 
 <img src="docs/redcap_logo.png" width="600" height="200" />
 
