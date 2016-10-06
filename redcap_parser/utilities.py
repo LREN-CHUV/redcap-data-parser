@@ -76,7 +76,7 @@ def row2comp(col_names,data_val):
     for idx in task_block_idx:
         s_idx = idx[0]
         e_idx = idx[1]
-        print s_idx, e_idx
+        #print s_idx, e_idx
         task = rowdata2task(col_names[s_idx:e_idx],data_val[s_idx:e_idx])
         if task.name != 'None':
             tasks.append(task)
@@ -206,14 +206,14 @@ def rowdata2component(ws,col_names,data_val):
                     
 
     else:
-        print '[Error] Could not find: which building block your component belongs to ?'
+        print '[Warning utilities.py] Could not find: which building block your component belongs to ?'
         
 
     index = find('Participant ID',col_names)
     if index != -1:
         comp.subject_ID = data_val[index]
     else:
-        print '[Error] Could not find:  Participant ID' 
+        print '[Warning utilities.py] Could not find:  Participant ID' 
         comp.subject_ID = 'None' 
     
     # Component name
@@ -222,7 +222,7 @@ def rowdata2component(ws,col_names,data_val):
     if index != -1:
         comp.component = data_val[index]
     else:
-        print '[Error] Could not find:  Name of this component'
+        print '[Warning utilities.py] Could not find:  Name of this component'
 
         
         
@@ -231,7 +231,7 @@ def rowdata2component(ws,col_names,data_val):
     if index != -1:
         comp.contribution = data_val[index]
     else:
-        print '[Error] Could not find:  Task number attached to this component'
+        print '[Warning utilities.py] Could not find:  Task number attached to this component'
 
 
     # Description
@@ -240,7 +240,7 @@ def rowdata2component(ws,col_names,data_val):
         print data_val[index]
         comp.short_desc = data_val[index]
     else:
-        print '[Error] Could not find a short description of this component'
+        print '[Warning utilities.py] Could not find a short description of this component'
 
 
     # Dependencies

@@ -118,12 +118,12 @@ class Task:
 
                 
             else:
-                print '[Error task.py] add_other_build_bolck: no such type: ', dtype, ' only [DATA | SOFTWARE | SERVICES] supported!'
+                print '[Warning task.py] add_other_build_bolck: no such type: ', dtype, ' only [DATA | SOFTWARE | SERVICES] supported!'
             
             
         else:
             
-            print '[Error task.py] add_other_build_bolck: elem == ', len(elem), ' should == 3'
+            print '[Warning task.py] add_other_build_bolck: elem == ', len(elem), ' should == 3'
         
 
 

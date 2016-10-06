@@ -244,7 +244,7 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft,services):
         r_idx = 0
         
     
-    print tcase, r_idx, tab_num_rows
+    #print tcase, r_idx, tab_num_rows
         
 
     if r_idx < len(table.rows):
