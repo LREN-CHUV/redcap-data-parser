@@ -45,7 +45,10 @@ If successful the redcap-parser will be installed.
 ```
 $ rcparse.py data.csv 
 ```
-It should create, where you executed the command, a time stamped microsoft word document.
+It should create, where you executed the command, a time stamped microsoft word document:
 
+```
+redcap_data_2016-10-06 16:31:24.docx
+```
 
 
