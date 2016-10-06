@@ -1,8 +1,12 @@
-import redcap_parser as rp
-import data2docx as d2d
+#!/usr/bin/env python
+
+from redcap_parser import redcap_parser as rp
+from redcap_parser import data2docx as d2d
+from redcap_parser import utilities as util
+
+
 from docx import Document
 from docx.shared import Pt
-import utilities as util
 
 import time
 import datetime
@@ -53,6 +57,7 @@ def parse(filename):
 
 if __name__ == '__main__':
     
+    
     parser = OptionParser()
 
     (options, args) = parser.parse_args()
@@ -64,8 +69,13 @@ if __name__ == '__main__':
             
             if filename.endswith('.csv'):
                 
-                    parse(filename)
+                        
                 
+                    print '=' * (len(filename)+2)
+                    print ' ', filename, ' '    
+                    print '=' * (len(filename)+2)
+                    parse(filename)
+                    
             else:
                 
                 print '[Error] : filename should end with .csv'

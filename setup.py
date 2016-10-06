@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+
+from setuptools import setup, find_packages
 
 
 setup(name='redcap-data-parser',
@@ -9,10 +10,10 @@ setup(name='redcap-data-parser',
       author='Guillaume de Chambrier',
       author_email='chambrierg@gmail.com',
       url='https://github.com/gpldecha/',
-      packages=['redcap_parser'],
+      packages=find_packages(),
       install_requires=[
 	'python-docx',
 	'openpyxl'
-      ]
-
+      ],
+      scripts=['bin/rcparse.py','bin/rcparse2.py']	
 )
