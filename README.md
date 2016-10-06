@@ -33,14 +33,14 @@ If successful the redcap-parser will be installed.
 
 # Quick usage
 
-1. Login to the [RedCap](https://lren.chuv.ch/redcap/)  website and navigate to your project and go to export data. 
+* Login to the [RedCap](https://lren.chuv.ch/redcap/)  website and navigate to your project and go to export data. 
 
 ![alt text](docs/redcap-website.png "The redcap website")
 
-2. Click on the icon shown in the figure above (first row and column entry in **Download Syntax & Data**) which 
+* Click on the icon shown in the figure above (first row and column entry in **Download Syntax & Data**) which 
    will prompt you to save a .csv file.
 
-3. Navigate in your terminal to the csv file and run the following command:
+* Navigate in your terminal to the csv file and run the following command:
 
 ```
 $ rcparse.py data.csv 
