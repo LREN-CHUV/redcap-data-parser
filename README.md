@@ -12,18 +12,18 @@ It contains descriptions software, data and web packages being developped by the
 
 # Installation
 
-1. Dependencies
+* Dependencies
 
 * [python-docx](https://python-docx.readthedocs.io/en/latest/)
 * [openpyxl](https://openpyxl.readthedocs.io/en/default/)
 
-2. Download or clone the repository.
+* Download or clone the repository.
 
 ```
 $ git clone https://github.com/LREN-CHUV/redcap-data-parser.git
 ```
 
-3. cd to ../redcap-data-parser/ and run the following command:
+* cd to ../redcap-data-parser/ and run the following command:
 
 ```
 $ sudo python setup.py install
