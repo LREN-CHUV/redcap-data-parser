@@ -36,7 +36,6 @@ If successful the redcap-parser will be installed.
 
 # Quick usage
 
-<img src="docs/redcap-website.png" width="600" height="200" />
-
+![alt text](docs/redcap-website.png "The redcap website")
 
 
