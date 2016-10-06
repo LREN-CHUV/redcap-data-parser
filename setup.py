@@ -7,6 +7,11 @@ setup(name='hbp-parser',
       description='redhat parser',
       author='Guillaume de Chambrier',
       author_email='chambrierg@gmail.com',
-      url='https://www.python.org/sigs/distutils-sig/',
-      packages=['parser'],
-     )
+      url='https://github.com/gpldecha/hbp-parser'
+      packages=find_packages(),
+      install_requires=[
+	'python-docx',
+	'openpyxl'
+      ]
+
+)
