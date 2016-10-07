@@ -15,5 +15,5 @@ setup(name='redcap-data-parser',
 	'python-docx',
 	'openpyxl'
       ],
-      scripts=['bin/rcparse.py','bin/rcparse2.py']	
+      scripts=['bin/rcparse.py']	
 )

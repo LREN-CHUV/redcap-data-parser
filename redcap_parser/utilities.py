@@ -19,8 +19,6 @@ def remove_quotations(string):
         return string[1:-1]
     else:
         return string
-        
-  
     
 def find(name,names):
     """
@@ -293,3 +291,66 @@ def rowdata2component(ws,col_names,data_val):
     
                         
     return comp
+    
+    
+def get_all_tasks(comps):
+    all_tasks = []
+
+    for comp in comps:
+        print 'Subject: ', comp.subject_ID, ' num_tasks: ', len(comp.tasks)
+        all_tasks.extend(comp.tasks)    
+    return all_tasks
+
+    
+
+def summary(comps):      
+    """
+        Gets the summary from task
+        
+        Parameters
+        ----------
+        
+        comps: list of objects of type Component
+
+    """    
+
+    summary_data = []
+
+
+    for comp in comps:
+        for task in comp.tasks:
+            # ('SOFTWARE', 'Data Factory (DF)', 'Feature Engineering')
+            if len(task.build_block_belong) == 3:
+                summary_data.append([ task.build_block_belong[1] , task.build_block_belong[2], task.name  ])
+
+
+    
+    summary_data = sorted(summary_data)
+    
+    # sort a list of list according to first element
+
+
+    return summary_data    
+
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

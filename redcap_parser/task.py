@@ -37,7 +37,7 @@ class Task:
         self.users              = []
 
         
-        self.build_block_belong = []
+        self.build_block_belong = [] # ('SOFTWARE', 'Data Factory (DF)', 'Feature Engineering')
        
         self.release             = dict()
 
