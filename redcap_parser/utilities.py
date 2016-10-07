@@ -321,7 +321,7 @@ def summary(comps):
         for task in comp.tasks:
             # ('SOFTWARE', 'Data Factory (DF)', 'Feature Engineering')
             if len(task.build_block_belong) == 3:
-                summary_data.append([ task.build_block_belong[1] , task.build_block_belong[2], task.name  ])
+                summary_data.append([ task.build_block_belong[1] , task.build_block_belong[2], task.name, task.task_number  ])
 
 
     

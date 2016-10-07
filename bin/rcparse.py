@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 
-
 from redcap_parser import parse as pa
 
 
 from optparse import OptionParser
 import os.path
-
-
 
 
 if __name__ == '__main__':

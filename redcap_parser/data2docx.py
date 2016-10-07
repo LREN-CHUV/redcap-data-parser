@@ -347,7 +347,6 @@ def summary_comp2docx(summary_data):
     """    
 
 
-    summary_data = [x for x in summary_data if x and len(x) == 3]
     num_rows     = len(summary_data)
 
     document = Document()
@@ -360,21 +359,23 @@ def summary_comp2docx(summary_data):
     document.add_paragraph()
     
     
-    table       = document.add_table(rows=num_rows+1, cols=3)
+    table       = document.add_table(rows=num_rows+1, cols=4)
     table.style = 'TableGrid'
 
     row = table.rows[0]
     row.cells[0].paragraphs[0].add_run('Build').bold = True
     row.cells[1].paragraphs[0].add_run('Product').bold = True
     row.cells[2].paragraphs[0].add_run('Componenet').bold = True
+    row.cells[3].paragraphs[0].add_run('Task').bold = True
+
 
 
     for i in range(1,num_rows+1):
         table.rows[i].cells[0].text = summary_data[i-1][0]
         table.rows[i].cells[1].text = summary_data[i-1][1]
         table.rows[i].cells[2].text = summary_data[i-1][2]
-    
-    
+        table.rows[i].cells[3].text = summary_data[i-1][3]
+   
     document.save('summary_components.docx')    
 
     
