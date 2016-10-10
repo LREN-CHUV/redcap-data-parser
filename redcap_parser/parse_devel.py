@@ -6,26 +6,33 @@ import utilities as util
 import parse as pp
 if __name__ == '__main__':
     
-    comps       = pp.parse('/home/guillaume/Documents/redcap/data2.csv')
+    comps       = pp.parse('/home/guillaume/Documents/redcap/data.csv')
     all_tasks   = util.get_all_tasks(comps)
 
+    stype=1
+
+    summary_data = util.summary(comps,stype)
+    d2d.summary_comp2docx(summary_data,stype)
+
+
+    len(summary_data)
+
+    summary_data[2]
 
 
 
-#%% Get summary of components
+
+#%% Check if have component
+
+data_tnames         = ['T8.2.1','T8.4.1']
+data_factor_tnames  = ['T8.1.1','T8.5.2',''] 
+
+task_names = ['T8.3.11',]
+
+has_v = util.has_tasks(summary_data,task_names,3)
 
 
-summary_data = util.summary(comps,stype=1)
-
-
-len(summary_data)
-
-summary_data[2]
-
-
-d2d.summary_comp2docx(summary_data)
-
-
+has_v
 
 #%% PUT TASKS FROM ALL COMPONENTS TOGTHER AND SAVE
 
@@ -40,8 +47,13 @@ font.size = Pt(6)
 
 tree = d2d.sorted_task2docx(document,all_tasks)
 
-document.save('redcap_sorted_new3.docx')    
+document.save('redcap_sorted.docx')    
     
+    
+#%%
+
+test = [['18', 'First dataset annotated according to the ontology.'], ['12', 'Prototype of the ontology for describing data on patients with neurological diseases developed'], ['24', 'Ontology and several datasets annotated according to the ontology.']]
+
 
 #%% SAVE ONE COMPONENT (TESTING)
 

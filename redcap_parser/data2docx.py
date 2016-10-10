@@ -91,6 +91,9 @@ def sorted_task2docx(document,tasks):
     return tree
 
 def task2docx(document,task,b_print_heading=True):
+    
+    bAddRelease = False
+    bAddUser    = False
 
     # To which building block your component belongs to
 
@@ -119,31 +122,57 @@ def task2docx(document,task,b_print_heading=True):
 
         #  add table
 
-        data_hosp = task.build_block_data.get('Hospital Data',[])
-        data_ref  = task.build_block_data.get('Reference data',[])
 
+        data      = task.build_block_data
         soft      = task.build_block_soft
         serv      = task.build_block_serv
+        model     = task.build_block_model
+        report    = task.build_block_reports
 
+        dependencies2docx(document,data,soft,serv,model,report)
 
-        dependencies2docx(document,data_hosp,data_ref,soft,serv)
+        
+        if bAddRelease:
+            # Prior Release table:
+            p = document.add_paragraph()
+            p.add_run('\n')
+            one_line_2_docx(p,'Releases:')
+            releases2docx(document,task.planned_functionality)
 
-
-        # Prior Release table:
-        p = document.add_paragraph()
-        p.add_run('\n')
-        one_line_2_docx(p,'Releases:')
-        releases2docx(document,task.planned_functionality)
-
-        # Prior User table:
-        p = document.add_paragraph()
-        p.add_run('\n')
-        one_line_2_docx(p,'User and Use cases:')
-        usecase2docx(document,task.users,task.short_desc_usecase)
+        if bAddUser:
+            # Prior User table:
+            p = document.add_paragraph()
+            p.add_run('\n')
+            one_line_2_docx(p,'User and Use cases:')
+            usecase2docx(document,task.users,task.short_desc_usecase)
 
 def  comp_dep_desc2docx(wdoc,task_name,task_number,short_desc_comp):
     table       = wdoc.add_table(rows=3, cols=2)
     table.style = 'Normal Table'
+    
+    if isinstance(short_desc_comp,unicode):
+        short_desc_comp = str(short_desc_comp.encode('ascii','ignore'))
+        
+    if isinstance(task_number,unicode):
+        task_number = str(task_number.encode('ascii','ignore')) 
+        
+    if isinstance(task_number,unicode):
+        task_name = str(task_name.encode('ascii','ignore'))         
+        
+        
+    if not isinstance(short_desc_comp,basestring):
+        print short_desc_comp
+        short_desc_comp = 'invalid'
+        
+        
+    if short_desc_comp is None:
+        short_desc_comp = 'None'
+        
+    
+    short_desc_comp = (short_desc_comp.decode("utf-8")).encode('ascii','ignore')         
+
+        
+    print task_name, ' type: ', type(short_desc_comp), ' short_desc: ',  short_desc_comp
 
     row = table.rows[0]
     row.cells[0].paragraphs[0].add_run('Component').bold = True
@@ -157,7 +186,34 @@ def  comp_dep_desc2docx(wdoc,task_name,task_number,short_desc_comp):
     row.cells[0].paragraphs[0].add_run('Contribution task').bold = True
     row.cells[1].text = short_desc_comp
 
-def dependencies2docx(wdoc,data_hosp,data_ref,soft,services):
+
+def add_dependency2table(table,name,data,row_idx):
+    
+    if len(data.keys()) == 0:
+        return row_idx
+    
+    if row_idx < len(table.rows):
+       
+        # Software Data
+        row = table.rows[row_idx]
+        row.cells[0].paragraphs[0].add_run(name).bold = True
+
+        idx = row_idx
+        for key in data:
+            row = table.rows[idx]
+            soft_desc = ', '.join(data[key])
+            #row.cells[1].text = key
+            row.cells[1].text = key + ': ' + soft_desc
+            idx = idx + 1
+        row_idx = idx
+        
+    else:
+        print '[Warning data2docx.py] r_idx >= len(table.rows):   r_idx: ', row_idx, '  len(table.rows):  ', len(table.rows)
+        
+    return row_idx     
+
+
+def dependencies2docx(wdoc,data,soft,services,models,report):
     """
 
     Takes Data and software information and puts it into a table
@@ -172,128 +228,41 @@ def dependencies2docx(wdoc,data_hosp,data_ref,soft,services):
     services : dict
 
     """
-
-    data_hosp = ', '.join(data_hosp)
-    data_ref  = ', '.join(data_ref)
-
-
-    if len(data_hosp) == 0:
-        bDataHosp = False
-    else:
-        bDataHosp = True
-
-    if len(data_ref) == 0:
-        bDataRef = False
-    else:
-        bDataRef = True
-
-
+    # get number of data 
+    num_data        = len(data.keys())
 
     # get number of sofware
-    num_soft = len(soft.keys())
+    num_soft        = len(soft.keys())
 
     # get number of services
-    num_serv = len(services.keys())
+    num_serv        = len(services.keys())
+    
+    # get number of models
+    num_models      = len(models.keys())
 
-
-    tcase = 'full'
-
-    if bDataHosp & bDataRef  :
-        tab_num_rows = 2 + num_soft + num_serv
-        tcase        = 'full'
-    elif (bDataHosp == True) & (bDataRef == False):
-        tab_num_rows = 1 + num_soft + num_serv
-        tcase        = 'only_hosp'
-    elif (bDataHosp == False) & (bDataRef == True):
-        tab_num_rows = 1 + num_soft + num_serv
-        tcase        = 'only_ref'
-    else:
-        tab_num_rows = num_soft + num_serv
-        tcase        = 'only_soft'
-
+    tab_num_rows = 0
+    tab_num_rows = tab_num_rows + num_data + num_soft + num_serv + num_models
+    
+    print ' ========== '
+    print 'num_data:   ', num_data
+    print 'num_soft:   ', num_soft    
+    print 'num_serv:   ', num_serv    
+    print 'num_models: ', num_models
+    
 
     if tab_num_rows == 0:
         return
 
     table       = wdoc.add_table(rows=tab_num_rows, cols=2)
     table.style = 'TableGrid'
-
-
-
-    if tcase == 'full':
-
-        # Hospital Data
-        row = table.rows[0]
-        row.cells[0].paragraphs[0].add_run('DATA').bold = True
-
-        #row.cells[1].text = 'Hospital'
-        row.cells[1].text = 'Hospital: ' + data_hosp
-
-        # Reference Data
-        row = table.rows[1]
-        # row.cells[1].text = 'Reference'
-        row.cells[1].text = 'Reference: ' + data_ref
-
-        r_idx = 2
-
-    elif tcase == 'only_hosp':
-
-        # Hospital Data
-        row = table.rows[0]
-        row.cells[0].paragraphs[0].add_run('DATA').bold = True
-
-        #row.cells[1].text = 'Hospital'
-        row.cells[1].text = 'Hospital: ' + data_hosp
-
-        r_idx = 1
-
-    elif tcase == 'only_ref':
-
-        # Reference Data
-        row = table.rows[0]
-        #row.cells[1].text = 'Reference'
-        row.cells[1].text = 'Reference: ' + data_ref
-
-        r_idx = 1
-
-    else:
-
-        r_idx = 0
-
-
-    #print tcase, r_idx, tab_num_rows
-
-
-    if r_idx < len(table.rows):
-        # Software Data
-        row = table.rows[r_idx]
-        row.cells[0].paragraphs[0].add_run('SOFTWARE').bold = True
-
-
-        idx = r_idx
-        for key in soft:
-            row = table.rows[idx]
-            soft_desc = ', '.join(soft[key])
-            #row.cells[1].text = key
-            row.cells[1].text = key + ': ' + soft_desc
-            idx = idx + 1
-        r_idx = idx
-    else:
-
-        print '[Warning data2docx.py] r_idx >= len(table.rows):   r_idx: ', r_idx, '  len(table.rows):  ', len(table.rows)
-
-    if num_serv != 0:
-        row = table.rows[r_idx]
-        row.cells[0].paragraphs[0].add_run('SERVICES').bold = True
-        idx = r_idx
-
-        for key in services:
-             row = table.rows[idx]
-             serv_desc = ', '.join(services[key])
-             #row.cells[1].text = key
-             row.cells[1].text = key + ': ' + serv_desc
-             idx = idx + 1
-        r_idx = idx
+    
+    r_idx = 0    
+    
+    r_idx = add_dependency2table(table,'DATA',data,r_idx)
+    r_idx = add_dependency2table(table,'SOFTWARE',soft,r_idx)
+    r_idx = add_dependency2table(table,'SERVICES',services,r_idx)
+    r_idx = add_dependency2table(table,'MODELS',models,r_idx)
+    r_idx = add_dependency2table(table,'REPORTS',report,r_idx)
 
 
 def releases2docx(wdoc,release):
@@ -309,13 +278,27 @@ def releases2docx(wdoc,release):
     table.style = 'TableGrid'
 
 
-    idx = 0
-    for key in release:
-        row = table.rows[idx]
-        row.cells[0].text = key
-        row.cells[1].text = release[key]
 
+    data = []
+    for key in release:
+        
+        name = key[-2:]
+        data.append([name,release[key]])
+
+
+    data = sorted(data)
+
+    idx = 0
+    for d in data:
+        row = table.rows[idx]
+        row.cells[0].text = 'Planned functionality M' + d[0]
+        row.cells[1].text = d[1]
         idx = idx + 1
+         
+
+    #
+    #row.cells[1].text = release[key]
+
 
 def usecase2docx(wdoc,users,short_desc_usecase):
 
@@ -335,7 +318,7 @@ def usecase2docx(wdoc,users,short_desc_usecase):
     row.cells[1].text = short_desc_usecase
 
 
-def summary_comp2docx(summary_data):
+def summary_comp2docx(summary_data,stype=0):
     """
     Parameters
     ----------
@@ -363,27 +346,38 @@ def summary_comp2docx(summary_data):
     table.style = 'TableGrid'
 
     row = table.rows[0]
-    row.cells[0].paragraphs[0].add_run('Build').bold = True
-    row.cells[1].paragraphs[0].add_run('Product').bold = True
-    row.cells[2].paragraphs[0].add_run('Componenet').bold = True
-    row.cells[3].paragraphs[0].add_run('Task').bold = True
+    if stype == 0:
+        row.cells[0].paragraphs[0].add_run('Build').bold = True
+        row.cells[1].paragraphs[0].add_run('Product').bold = True
+        row.cells[2].paragraphs[0].add_run('Component').bold = True
+        row.cells[3].paragraphs[0].add_run('Task').bold = True
 
+    elif stype == 1:
 
-    if len(summary_data) > 0:
+        row.cells[0].paragraphs[0].add_run('Component').bold = True
+        row.cells[1].paragraphs[0].add_run('Planned functionalities at M12').bold = True
+        row.cells[2].paragraphs[0].add_run('Planned functionalities at M18').bold = True
+        row.cells[3].paragraphs[0].add_run('Planned functionalities at M24').bold = True
         
-        if len(summary_data[0]) == 4:
+    else:
+        print '[Warning]: only stype == (0 or 1) supported'
 
-            for i in range(1,num_rows+1):
-                table.rows[i].cells[0].text = summary_data[i-1][0]
-                table.rows[i].cells[1].text = summary_data[i-1][1]
-                table.rows[i].cells[2].text = summary_data[i-1][2]
-                table.rows[i].cells[3].text = summary_data[i-1][3]
-                
-            else:
-                
-                print 'len(summary_data[0]) != 4 : = ', len(summary_data[0])
+
+    for i in range(1,num_rows+1):
+        #
+        # 1 : M18
+        # 2 : M12
+        # 3 : M24
+    
+        table.rows[i].cells[0].text = summary_data[i-1][0] # Component
+        table.rows[i].cells[1].text = summary_data[i-1][2]
+        table.rows[i].cells[2].text = summary_data[i-1][1]
+        table.rows[i].cells[3].text = summary_data[i-1][3]
    
-    document.save('summary_components.docx')    
+    if stype == 0:
+        document.save('summary_components_build_prod_comp_task.docx')    
+    elif stype == 1:
+        document.save('summary_components_planned_functionality.docx')            
 
     
     

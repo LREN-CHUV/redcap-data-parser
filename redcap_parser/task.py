@@ -39,12 +39,12 @@ class Task:
         
         self.build_block_belong = [] # ('SOFTWARE', 'Data Factory (DF)', 'Feature Engineering')
        
-        self.release             = dict()
-
  
         self.build_block_data    = dict()        
         self.build_block_soft    = dict()
         self.build_block_serv    = dict()
+        self.build_block_model   = dict()
+        self.build_block_reports = dict()
 
         """
             key: Planned functionality at M12    value: Report on access restrictions in the MIP 
@@ -52,17 +52,31 @@ class Task:
         self.planned_functionality   = dict()
         
         
+    
+    def add_dictionary(self,elem,dictionary):
+        
+        dname    = elem[1]  
+        num_elem = len(elem)
+        
+        if num_elem >= 3:
+            desc  = elem[2]
+        else:
+            desc = 'No description'
+            
+        #check if name is unicode
+        if isinstance(desc,unicode):
+           desc = str(desc.encode('ascii','ignore'))             
+ 
+        if isinstance(dname,unicode):
+           dname = str(dname.encode('ascii','ignore'))           
+
+        if dname in self.build_block_data:
+            dictionary[dname].append(desc)
+        else:
+            dictionary[dname] = [desc]    
         
         
         
-        
-        
-   # def add_functionality(self,name,desc):
-   #    
-   #   if name in self.release:
-   #       self.release[name].append(desc)
-   #   else:
-   #       self.release[name] = [desc]     
 
     def add_other_build_block(self,elem):
         """
@@ -83,47 +97,42 @@ class Task:
         
         """
         
-        if len(elem) == 3:
+        num_elem = len(elem)
+        
+        if (num_elem == 4) or (num_elem == 3) or (num_elem == 2):
             
             dtype = elem[0]
             if dtype == 'DATA':
                 
-                dname = elem[1]     
-                desc  = elem[2]
-
-                if dname in self.build_block_data:
-                    self.build_block_data[dname].append(desc)
-                else:
-                    self.build_block_data[dname] = [desc]     
+                self.add_dictionary(elem,self.build_block_data)
+  
                 
             elif dtype == 'SOFTWARE':
-            
-                dname = elem[1]     
-                desc  = elem[2]
+                
+                self.add_dictionary(elem,self.build_block_soft)
 
-                if dname in self.build_block_soft:
-                    self.build_block_soft[dname].append(desc)
-                else:
-                    self.build_block_soft[dname] = [desc]     
 
             elif dtype == 'SERVICES':
                 
-                dname = elem[1]     
-                desc  = elem[2]
+                self.add_dictionary(elem,self.build_block_serv)
 
-                if dname in self.build_block_soft:
-                    self.build_block_serv[dname].append(desc)
-                else:
-                    self.build_block_serv[dname] = [desc]     
-
+                      
+            elif dtype == 'MODELS MODELS':
                 
+                self.add_dictionary(elem,self.build_block_model)
+
+                    
+            elif dtype == 'REPORTS':
+                
+                self.add_dictionary(elem,self.build_block_reports)
+
             else:
-                print '[Warning task.py] add_other_build_bolck: no such type: ', dtype, ' only [DATA | SOFTWARE | SERVICES] supported!'
+                print '[Warning task.py] add_other_build_bolck: no such type: ', dtype, ' only [DATA | SOFTWARE | SERVICES | MODELS] supported!'
             
             
         else:
             
-            print '[Warning task.py] add_other_build_bolck: elem == ', len(elem), ' should == 3'
+            print '[Warning task.py] add_other_build_bolck: elem == ', len(elem), ' should == 2 or 3', elem
         
 
 

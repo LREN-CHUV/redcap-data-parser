@@ -7,6 +7,7 @@ Created on Tue Oct  4 15:46:48 2016
 """
 from component import Component
 from task import Task
+from  __builtin__ import any as b_any
 
 def unicode2ascii(value):
     if isinstance(value,unicode):
@@ -301,6 +302,34 @@ def get_all_tasks(comps):
         all_tasks.extend(comp.tasks)    
     return all_tasks
 
+    
+def has_tasks(summary_data,values,col_idx):
+   """
+        Check if summary_data has these particular values.    
+    
+        summary_data: list : N x 4
+                
+   """                
+    
+   num_rows = len(summary_data) 
+   num_val  = len(values)   
+   
+   has_v    = [False] * num_val
+
+   for i in range(0,num_rows):
+       task = summary_data[i][col_idx] 
+       
+       print task
+       
+       for j in range(0,num_val):
+           print 'values[', j, ']: ', values[j]
+           if values[j] in task:
+               has_v[i] = True
+               j = num_val
+ 
+    
+   return has_v
+    
     
 
 def summary(comps,stype=0):      
