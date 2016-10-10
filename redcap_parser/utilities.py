@@ -303,7 +303,7 @@ def get_all_tasks(comps):
 
     
 
-def summary(comps):      
+def summary(comps,stype=0):      
     """
         Gets the summary from task
         
@@ -316,21 +316,39 @@ def summary(comps):
 
     summary_data = []
 
+    if stype == 0:
 
-    for comp in comps:
-        for task in comp.tasks:
-            # ('SOFTWARE', 'Data Factory (DF)', 'Feature Engineering')
-            if len(task.build_block_belong) == 3:
-                summary_data.append([ task.build_block_belong[1] , task.build_block_belong[2], task.name, task.task_number  ])
+        for comp in comps:
+            for task in comp.tasks:
+                # ('SOFTWARE', 'Data Factory (DF)', 'Feature Engineering')
+                if len(task.build_block_belong) == 3:
+                    summary_data.append([ task.build_block_belong[1] , task.build_block_belong[2], task.name, task.task_number  ])
 
+        
 
+    else:   
+        
+     # should aways be three   
+     #  [Component name .  Planned functionalities at M18,  Planned functionality at M12, Planned functionalities at M24]
+        for comp in comps:
+            for task in comp.tasks:
+                # ('SOFTWARE', 'Data Factory (DF)', 'Feature Engineering')
+                val =  [task.name] + task.planned_functionality.values()
+                if ''.join(val) != '': 
+                    summary_data.append(val)
+            
     
-    summary_data = sorted(summary_data)
+       # summary_data = sorted(summary_data)
+    
+    
     
     # sort a list of list according to first element
 
 
     return summary_data    
+    
+
+    
 
         
     

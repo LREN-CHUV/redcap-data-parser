@@ -4,10 +4,9 @@ from docx import Document
 from docx.shared import Pt
 import utilities as util
 import parse as pp
-
 if __name__ == '__main__':
     
-    comps       = pp.parse('/home/guillaume/Documents/redhat/data.csv')
+    comps       = pp.parse('/home/guillaume/Documents/redcap/data2.csv')
     all_tasks   = util.get_all_tasks(comps)
 
 
@@ -16,9 +15,15 @@ if __name__ == '__main__':
 #%% Get summary of components
 
 
-summay_data = util.summary(comps)
+summary_data = util.summary(comps,stype=1)
 
-d2d.summary_comp2docx(summay_data)
+
+len(summary_data)
+
+summary_data[2]
+
+
+d2d.summary_comp2docx(summary_data)
 
 
 

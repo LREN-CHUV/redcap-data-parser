@@ -369,12 +369,19 @@ def summary_comp2docx(summary_data):
     row.cells[3].paragraphs[0].add_run('Task').bold = True
 
 
+    if len(summary_data) > 0:
+        
+        if len(summary_data[0]) == 4:
 
-    for i in range(1,num_rows+1):
-        table.rows[i].cells[0].text = summary_data[i-1][0]
-        table.rows[i].cells[1].text = summary_data[i-1][1]
-        table.rows[i].cells[2].text = summary_data[i-1][2]
-        table.rows[i].cells[3].text = summary_data[i-1][3]
+            for i in range(1,num_rows+1):
+                table.rows[i].cells[0].text = summary_data[i-1][0]
+                table.rows[i].cells[1].text = summary_data[i-1][1]
+                table.rows[i].cells[2].text = summary_data[i-1][2]
+                table.rows[i].cells[3].text = summary_data[i-1][3]
+                
+            else:
+                
+                print 'len(summary_data[0]) != 4 : = ', len(summary_data[0])
    
     document.save('summary_components.docx')    
 
