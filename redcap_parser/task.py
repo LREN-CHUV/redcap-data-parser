@@ -40,6 +40,9 @@ class Task:
         self.build_block_belong = [] # ('SOFTWARE', 'Data Factory (DF)', 'Feature Engineering')
        
  
+        """
+            Dependencies of this task
+        """
         self.build_block_data    = dict()        
         self.build_block_soft    = dict()
         self.build_block_serv    = dict()
@@ -145,12 +148,32 @@ class Task:
         print '\n\n'
         print 'To which building block your component belongs to ?        : ', self.build_block_belong, '\n'
         print 'Which other building blocks does your component need ?     : \n'
-        print '      DATA:'
-        for key in self.build_block_data:
-            print '             ', self.build_block_data[key]
-        print '      SOFTWARE:'
-        for key in self.build_block_soft:
-            print '             ', self.build_block_soft[key]
+       
+        if self.build_block_data:
+            print '      DATA:'
+            for key in self.build_block_data:
+                print '             ', self.build_block_data[key]
+            
+        if self.build_block_soft:
+            print '      SOFTWARE:'        
+            for key in self.build_block_soft:
+                print '             ', self.build_block_soft[key]
+          
+        if self.build_block_serv:
+            print '      SERVICE:'
+            for key in self.build_block_serv:
+                print '             ', self.build_block_serv[key]
+         
+        if self.build_block_model:
+            print '      MODELS:'
+            for key in self.build_block_model:
+                print '             ', self.build_block_model[key]    
+
+        if self.build_block_reports:
+            print '      REPORTS:'
+            for key in self.build_block_reports:
+                print '             ', self.build_block_reports[key]       
+                
         
         print '\n\n'
         for key in self.planned_functionality:

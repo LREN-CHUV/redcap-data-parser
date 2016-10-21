@@ -331,6 +331,48 @@ def has_tasks(summary_data,values,col_idx):
    return has_v
     
     
+def dic2str(dic):
+    st = ''
+    for key in dic:   
+        st = st + str(key) + ': ' + ', '.join(dic[key]) + '   |   '
+    return st
+    
+
+def get_dependencies(task,dtype=0):
+
+    if dtype == 0:
+
+        dependencies = []
+
+        if task.build_block_data:
+            dependencies.extend(task.build_block_data.values()[0])
+        
+        if task.build_block_soft:
+            dependencies.extend(task.build_block_soft.values()[0])
+
+        if task.build_block_serv:
+            dependencies.extend(task.build_block_serv.values()[0])
+
+        if task.build_block_model:
+            dependencies.extend(task.build_block_model.values()[0])
+
+        if task.build_block_reports:
+            dependencies.extend(task.build_block_reports.values()[0])   
+            
+        return dependencies    
+            
+    elif dtype == 1:
+                   
+         print 'dic2str(task.build_block_data): ', dic2str(task.build_block_data)  , 'key'        
+         dependencies = ''
+         dependencies = dependencies + dic2str(task.build_block_data) + dic2str(task.build_block_soft) + dic2str(task.build_block_serv) + dic2str(task.build_block_model) + dic2str(task.build_block_reports)
+      
+         return dependencies
+         
+    else:
+        
+        return []
+    
 
 def summary(comps,stype=0):      
     """
@@ -340,6 +382,12 @@ def summary(comps,stype=0):
         ----------
         
         comps: list of objects of type Component
+        
+        stype : type of data summary
+        
+                - 0 
+                - 1
+                - 2 : for excel confusion matrix
 
     """    
 
@@ -351,35 +399,60 @@ def summary(comps,stype=0):
             for task in comp.tasks:
                 # ('SOFTWARE', 'Data Factory (DF)', 'Feature Engineering')
                 if len(task.build_block_belong) == 3:
-                    summary_data.append([ task.build_block_belong[1] , task.build_block_belong[2], task.name, task.task_number  ])
+                    dep = get_dependencies(task,dtype=1)    
+                    print dep
+                    if dep == '':
+                        dep = 'None'
+                    summary_data.append([ task.build_block_belong[1] , task.build_block_belong[2], task.name, task.task_number, dep])
 
         
 
-    else:   
+    elif stype == 1:   
         
      # should aways be three   
-     #  [Component name .  Planned functionalities at M18,  Planned functionality at M12, Planned functionalities at M24]
+     #  [Component name ,  Planned functionalities at M18,  Planned functionality at M12, Planned functionalities at M24]
         for comp in comps:
             for task in comp.tasks:
                 # ('SOFTWARE', 'Data Factory (DF)', 'Feature Engineering')
                 val =  [task.name] + task.planned_functionality.values()
                 if ''.join(val) != '': 
                     summary_data.append(val)
+                    
+                    
+    elif stype == 2:
+        for comp in comps:
+            for task in comp.tasks:
+                if len(task.build_block_belong) == 3:
+                    
+                    dep = get_dependencies(task)                    
+                    summary_data.append({ 'name' : task.name, 'build' : task.build_block_belong[1], 'dep': dep })       
+                
+        # [  Component name |  Build  bl]                
             
     
-       # summary_data = sorted(summary_data)
-    
-    
-    
-    # sort a list of list according to first element
-
-
     return summary_data    
     
 
     
-
+def get_list_depenencies(summary):
+    """
         
+        summary[0] : dict
+        
+            keys: 'name', 'build', 'dep'
+            
+            summary[0]['name']  = 'Brain morphological features'
+            summary[0]['build'] = 'Data Factory (DF)'
+            summary[0]['dep']   = ['Lille Hospital', 'Tel Aviv Hospital', 'Milano Hospital', 'Freiburg Hospital', 'CHUV Hospital', 'Data Storage']
+
+    """      
+
+    all_dep = []
+    for summ in summary:
+        all_dep.extend(summ['dep'])
+    
+    
+    return list(set(all_dep))    
     
     
     

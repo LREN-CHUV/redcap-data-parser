@@ -1,23 +1,106 @@
 import redcap_parser as rp
 import data2docx as d2d
+import data2excel as d2e
+from openpyxl import Workbook
+
+
 from docx import Document
 from docx.shared import Pt
 import utilities as util
 import parse as pp
 if __name__ == '__main__':
     
+    
     comps       = pp.parse('/home/guillaume/Documents/redcap/data.csv')
     all_tasks   = util.get_all_tasks(comps)
 
-    stype=1
+    stype=0
 
     summary_data = util.summary(comps,stype)
+    
+#%%    
+    
+    d2d.summary_comp2docx(summary_data,stype)
+    
+    #%%
+
+    deps = util.get_list_depenencies(summary_data)    
+    
+    
+    wb = d2e.comp2excel(summary_data,deps)
+    
+    
+#%% function    
+    
+        
+def get_dep_indicies(dep,deps):
+    """
+        For a component name find the row indicies of the dependencies.
+        
+        Parameters
+        ----------
+        
+        dep: list of dependecies: ['Image & Genetic Viewer',..]
+        
+    """
+    
+    indicies = []
+ 
+    for d in dep:
+        for i in range(0,len(deps)):
+            if d == deps[i]:
+                indicies.extend([i])
+            
+    return indicies
+        
+        
+    
+#%% DEVEL
+
+    
+    wb  = Workbook()
+    ws1 = wb.create_sheet("summary",0) #
+
+    # Add dependency names in columne
+    r = 2    
+    for dep in deps:
+        ws1.cell(row=r, column=1, value=dep)    
+        r = r + 1
+
+
+    # Add dependency names in columne
+    col = 2    
+    for summ in summary_data:
+        ws1.cell(row=1, column=col, value=summ['name']) 
+        
+        print summ
+        
+        idx = get_dep_indicies(summ['dep'],deps)
+        
+        print idx
+        
+        if idx:
+            for i in idx:
+                cs = ws1.cell(row=i+2, column=col, value='1')    
+                cs.style.alignment.horizontal = 'center'
+        
+        col = col + 1
+            
+    
+#%%    
+    
+    wb.save('summary.xlsx')
+    
+    
+    #%%
     d2d.summary_comp2docx(summary_data,stype)
 
 
     len(summary_data)
 
     summary_data[2]
+
+
 
 
 

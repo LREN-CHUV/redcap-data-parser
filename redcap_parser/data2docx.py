@@ -342,42 +342,56 @@ def summary_comp2docx(summary_data,stype=0):
     document.add_paragraph()
     
     
-    table       = document.add_table(rows=num_rows+1, cols=4)
-    table.style = 'TableGrid'
-
-    row = table.rows[0]
     if stype == 0:
+        
+        table       = document.add_table(rows=num_rows+1, cols=5)
+        table.style = 'TableGrid'
+        row = table.rows[0]
         row.cells[0].paragraphs[0].add_run('Build').bold = True
         row.cells[1].paragraphs[0].add_run('Product').bold = True
         row.cells[2].paragraphs[0].add_run('Component').bold = True
         row.cells[3].paragraphs[0].add_run('Task').bold = True
+        row.cells[4].paragraphs[0].add_run('Dependency').bold = True      
+        
+        for i in range(1,num_rows+1):
+            table.rows[i].cells[0].text = summary_data[i-1][0] # Component
+            table.rows[i].cells[1].text = summary_data[i-1][2]
+            table.rows[i].cells[2].text = summary_data[i-1][1]
+            table.rows[i].cells[3].text = summary_data[i-1][3]
+            table.rows[i].cells[4].text = summary_data[i-1][4]
 
+        document.save('summary_components_build_prod_comp_task.docx')    
+
+        
+        
     elif stype == 1:
-
+        
+        table       = document.add_table(rows=num_rows+1, cols=4)
+        table.style = 'TableGrid'
+        row = table.rows[0]
         row.cells[0].paragraphs[0].add_run('Component').bold = True
         row.cells[1].paragraphs[0].add_run('Planned functionalities at M12').bold = True
         row.cells[2].paragraphs[0].add_run('Planned functionalities at M18').bold = True
         row.cells[3].paragraphs[0].add_run('Planned functionalities at M24').bold = True
         
+
+        
+        for i in range(1,num_rows+1):
+            # 1 : M18
+            # 2 : M12
+            # 3 : M24
+            table.rows[i].cells[0].text = summary_data[i-1][0] # Component
+            table.rows[i].cells[1].text = summary_data[i-1][2]
+            table.rows[i].cells[2].text = summary_data[i-1][1]
+            table.rows[i].cells[3].text = summary_data[i-1][3]
+        
+        document.save('summary_components_planned_functionality.docx')            
+        
+        
     else:
         print '[Warning]: only stype == (0 or 1) supported'
 
 
-    for i in range(1,num_rows+1):
-        #
-        # 1 : M18
-        # 2 : M12
-        # 3 : M24
-    
-        table.rows[i].cells[0].text = summary_data[i-1][0] # Component
-        table.rows[i].cells[1].text = summary_data[i-1][2]
-        table.rows[i].cells[2].text = summary_data[i-1][1]
-        table.rows[i].cells[3].text = summary_data[i-1][3]
-   
-    if stype == 0:
-        document.save('summary_components_build_prod_comp_task.docx')    
-    elif stype == 1:
-        document.save('summary_components_planned_functionality.docx')            
 
     
     
